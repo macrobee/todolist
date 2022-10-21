@@ -1,0 +1,10 @@
+.item-card{
+    background-color: pink;
+    width: 200px;
+    border-radius: 5px;
+    border: 2px solid grey;
+    padding: 10px;
+}
+.Completed{
+    background-color: rgb(196, 241, 188);
+}

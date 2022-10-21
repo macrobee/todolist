@@ -1,0 +1,16 @@
+.edit-form{
+    display: flex;
+    flex-direction: column;
+    justify-items: space-between;
+    align-items: center;
+    border: 5px solid black;
+    border-radius: 10px;
+    width: min(500px, 50%);
+}
+.form-item{
+    display: flex;
+    flex-direction: column;
+    justify-items: space-between;
+    align-items: flex-start;
+    width: 100%;
+}
