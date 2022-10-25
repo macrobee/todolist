@@ -12,11 +12,13 @@ class EditForm extends Component {
       due: "",
       priority: 1,
       completed: false,
+      missingField: null,
     };
     // this.collectDataOnSubmit = this.collectDataOnSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.logData = this.logData.bind(this);
     this.sendData = this.sendData.bind(this);
+    this.renderErrorMessage = this.renderErrorMessage.bind(this);
   }
   handleChange(e) {
     const target = e.target.id;
@@ -26,7 +28,7 @@ class EditForm extends Component {
   sendData(e) {
     e.preventDefault();
     const { title, type, description, due, priority, completed } = this.state;
-    console.log(title, description, due, priority);
+    console.log(title, type, description, due, priority, completed);
     const taskType = type;
     const newData = {
       title,
@@ -36,17 +38,50 @@ class EditForm extends Component {
       completed,
       identifier: uniqid(),
     };
-    this.props.addTask(taskType, newData);
+
+    // handling case if user leaves field blank
+    let missingDataField = this.findMissingField(newData);
+    console.log(missingDataField + " is missing");
+    if (missingDataField) {
+      const errorMessage = this.renderErrorMessage(missingDataField);
+      this.setState({ missingField: errorMessage });
+    } else {
+      this.setState({ missingField: null });
+      this.props.addTask(taskType, newData);
+      this.props.closeEditor();
+    }
   }
 
+  findMissingField(data) {
+    //returns name of blank data field or null if none found
+    let missingField = null;
+    for (const [key, value] of Object.entries(data)) {
+      if (value === "") {
+        missingField = key;
+        break;
+      }
+    }
+    return missingField;
+  }
+  renderErrorMessage(missingField) {
+    //returns error helper text
+    this.setState({ missingField: true });
+    const possibleFields = {
+      title: "title",
+      description: "description",
+      due: "due date",
+    };
+    return <p>Please enter a {possibleFields[missingField]}</p>;
+  }
   logData() {
     //for testing
     console.log(this.state);
   }
   render() {
+    const renderError = this.state.missingField;
     return (
       <div className="edit-form">
-        <button onClick={this.logData}>Log current data</button>
+        {/* <button onClick={this.logData}>Log current data</button> */}
         <form onSubmit={this.sendData}>
           <div className="form-item">
             <label htmlFor="title">Task title:</label>
@@ -108,9 +143,13 @@ class EditForm extends Component {
               onChange={this.handleChange}
             />
           </div>
+          <div className="error">{renderError}</div>
         </form>
       </div>
     );
+  }
+  componentDidUpdate() {
+    console.log("hello, component updated");
   }
 }
 export default EditForm;

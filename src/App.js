@@ -4,6 +4,9 @@ import uniqid from "uniqid";
 import ItemGroup from "./Components/ItemGroup";
 import newItem from "./Modules/newItem.js";
 import EditForm from "./Components/EditForm";
+import Overview from "./Components/Overview";
+import { ReactComponent as PlusIcon } from "./Components/plus.svg";
+
 
 class App extends Component {
   constructor() {
@@ -11,17 +14,17 @@ class App extends Component {
     this.state = {
       projects: [
         {
-          title: "project 0",
-          description: "eat food",
-          due: "march",
+          title: "Todo List",
+          description: "Complete features of todo list project",
+          due: "2022-11-29",
           priority: 2,
           completed: false,
           identifier: uniqid(),
         },
         {
-          title: "project 1",
-          description: "drink water",
-          due: "feb",
+          title: "Weather app",
+          description: "learn APIs and async data handling",
+          due: "2022-12-29",
           priority: 1,
           completed: false,
           identifier: uniqid(),
@@ -29,9 +32,9 @@ class App extends Component {
       ],
       todos: [
         {
-          title: "todo 0",
-          description: "cook food",
-          due: "april",
+          title: "Run 5k",
+          description: "run around neighborhood 3 times",
+          due: "2023-10-26",
           priority: 1,
           completed: false,
           identifier: uniqid(),
@@ -39,15 +42,15 @@ class App extends Component {
       ],
       goals: [
         {
-          title: "goal 0",
+          title: "Run a marathon",
           description: "digest food",
-          due: "may",
+          due: "2023-10-27",
           priority: 0,
           completed: false,
           identifier: uniqid(),
         },
       ],
-      isEditing: true,
+      isEditing: false,
     };
     this.addTask = this.addTask.bind(this);
     this.createToDo = this.createToDo.bind(this);
@@ -73,12 +76,11 @@ class App extends Component {
 
   removeCard(e) {
     //done
-    //done
     console.log(e.currentTarget.parentElement.getAttribute("identifier"));
     const taskIdentifier =
       e.currentTarget.parentElement.getAttribute("identifier");
 
-    const taskCategory = e.currentTarget.parentElement.parentElement
+    const taskCategory = e.currentTarget.parentElement
       .getAttribute("category")
       .toLowerCase();
     console.log(this.state[taskCategory]);
@@ -123,11 +125,10 @@ class App extends Component {
     //done
     const taskIdentifier =
       e.currentTarget.parentElement.getAttribute("identifier");
-    const taskCategory = e.currentTarget.parentElement.parentElement
+    const taskCategory = e.currentTarget.parentElement
       .getAttribute("category")
       .toLowerCase();
     let newTaskList = this.state[taskCategory];
-
     let selectedTask = newTaskList.filter(
       (task) => task.identifier === taskIdentifier
     ); //returns array of 1 item (selected task)
@@ -149,19 +150,37 @@ class App extends Component {
   }
   showEditor() {
     if (this.state.isEditing) {
-      return <EditForm addTask={this.addTask} />;
+      return <EditForm addTask={this.addTask} closeEditor={this.toggleEditor}/>;
     } else {
       return null;
     }
   }
+  updateUpcoming(){
+    //for this.state.projects, this.state.todos, this.state.goals
+    //iterate through list and return items with due dates within 10 days
+    //need to get today's date
+    //date diff <= 10
+    // max 5 items before scroll bar?
+  }
+  updateCompleted(){
+    //for this.state.projects, this.state.todos, this.state.goals
+    //iterate through list and return items with completed status
+  }
   render() {
     return (
       <div className="App">
-        <h1>Task Planner</h1>
-        <button onClick={this.toggleEditor}>Open editor</button>
+        <div className="header">
+          <h1>Task Planner</h1>
+          <div className="button-container">
+            <button onClick={this.toggleEditor} id="add-task">
+              Create Task <PlusIcon height={15 } width={15 } fill='white'/>
+            </button>
+          </div>
+        </div>
+
         {this.showEditor()}
-        <button onClick={this.addNewItem}>Log new</button> {/* for testing */}
-        <div className="container">
+        {/* <button onClick={this.addNewItem}>Log new</button>  */}
+        <div className="taskgroup-container">
           <ItemGroup
             groupName="Projects"
             items={this.state.projects}
@@ -180,6 +199,9 @@ class App extends Component {
             removeCard={this.removeCard}
             markComplete={this.markAsComplete}
           />
+        </div>
+        <div className="overview-container">
+          <Overview upcoming={[]} completed={[]} />
         </div>
       </div>
     );
