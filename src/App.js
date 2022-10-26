@@ -7,7 +7,6 @@ import EditForm from "./Components/EditForm";
 import Overview from "./Components/Overview";
 import { ReactComponent as PlusIcon } from "./Components/plus.svg";
 
-
 class App extends Component {
   constructor() {
     super();
@@ -51,76 +50,52 @@ class App extends Component {
         },
       ],
       isEditing: false,
+      today: null,
     };
-    this.addTask = this.addTask.bind(this);
-    this.createToDo = this.createToDo.bind(this);
     this.addNewItem = this.addNewItem.bind(this);
+    this.addTask = this.addTask.bind(this);
+
     this.removeCard = this.removeCard.bind(this);
     this.markAsComplete = this.markAsComplete.bind(this);
     this.toggleEditor = this.toggleEditor.bind(this);
+    this.showEditor = this.showEditor.bind(this);
+    this.makeUpcomingList = this.makeUpcomingList.bind(this);
+    this.makeCompletedList = this.makeCompletedList.bind(this);
+  }
+  componentDidMount() {
+    const today = new Date(new Date().toISOString().slice(0, 10));
+    this.setState({ today });
+    //get state data from local storage
   }
   addNewItem() {
-    console.log(newItem);
     this.addTask("goals", newItem);
-    console.log(this.state.goals);
   }
 
   addTask(type, info) {
     this.setState((state) => {
-      console.log(state);
-      console.log(type);
-      console.log(info);
       return { [type]: state[type].concat(info) };
     });
   }
-
+  modifyTask(task){
+    //get current task title, description, due, priority, completion
+    //collect new info
+    //replace task in list
+  }
   removeCard(e) {
     //done
-    console.log(e.currentTarget.parentElement.getAttribute("identifier"));
     const taskIdentifier =
       e.currentTarget.parentElement.getAttribute("identifier");
 
     const taskCategory = e.currentTarget.parentElement
       .getAttribute("category")
       .toLowerCase();
-    console.log(this.state[taskCategory]);
     let newTaskList = this.state[taskCategory].filter((task) => {
       return task.identifier != taskIdentifier;
     });
-    console.log(newTaskList);
     this.setState({ [taskCategory]: newTaskList });
   }
 
-  createToDo() {
-    //defunct
-    const projectArray = this.state.projects;
-    const todoArray = this.state.todos;
-    const goalArray = this.state.goals;
-    console.log(projectArray);
-    // console.log(projectArray[0].title);
-    console.log(todoArray);
-    console.log(goalArray);
-    let projectItems = projectArray.map((project) => {
-      const projectKey = uniqid();
-      console.log(project.title);
-      return (
-        <p key={projectKey}>
-          title: {project.title}, description: {project.description}
-        </p>
-      );
-    });
-
-    return (
-      <div>
-        Projects:
-        {projectItems}
-        {/* Todos:
-        {todoItems}
-        Goals:
-        {goalItems} */}
-      </div>
-    );
-  }
+  
   markAsComplete(e) {
     //done
     const taskIdentifier =
@@ -150,21 +125,37 @@ class App extends Component {
   }
   showEditor() {
     if (this.state.isEditing) {
-      return <EditForm addTask={this.addTask} closeEditor={this.toggleEditor}/>;
+      return (
+        <EditForm addTask={this.addTask} closeEditor={this.toggleEditor} today={this.state.today}/>
+      );
     } else {
       return null;
     }
   }
-  updateUpcoming(){
-    //for this.state.projects, this.state.todos, this.state.goals
-    //iterate through list and return items with due dates within 10 days
-    //need to get today's date
-    //date diff <= 10
-    // max 5 items before scroll bar?
+  makeUpcomingList() {
+    const { projects, todos, goals } = this.state;
+    const allTasks = [...projects, ...todos, ...goals];
+    let incompleteTasks = allTasks.filter((task) => {
+      return task.completed === false;
+    });
+
+    let sortedList = incompleteTasks.sort((currTask, prevTask) => {
+      const currTaskDate = new Date(currTask.due);
+      const prevTaskDate = new Date(prevTask.due);
+      return currTaskDate - prevTaskDate;
+    });
+    return sortedList.length > 5 ? sortedList.slice(0, 5) : sortedList;
   }
-  updateCompleted(){
+  makeCompletedList() {
+    const { projects, todos, goals } = this.state;
+    const allTasks = [...projects, ...todos, ...goals];
+
+    let completedTaskList = allTasks.filter((task) => {
+      return task.completed === true;
+    });
     //for this.state.projects, this.state.todos, this.state.goals
     //iterate through list and return items with completed status
+    return completedTaskList;
   }
   render() {
     return (
@@ -173,7 +164,7 @@ class App extends Component {
           <h1>Task Planner</h1>
           <div className="button-container">
             <button onClick={this.toggleEditor} id="add-task">
-              Create Task <PlusIcon height={15 } width={15 } fill='white'/>
+              Create Task <PlusIcon height={15} width={15} fill="white" />
             </button>
           </div>
         </div>
@@ -182,17 +173,18 @@ class App extends Component {
         {/* <button onClick={this.addNewItem}>Log new</button>  */}
         <div className="taskgroup-container">
           <ItemGroup
-            groupName="Projects"
-            items={this.state.projects}
-            removeCard={this.removeCard}
-            markComplete={this.markAsComplete}
-          />
-          <ItemGroup
             groupName="Todos"
             items={this.state.todos}
             removeCard={this.removeCard}
             markComplete={this.markAsComplete}
           />
+          <ItemGroup
+            groupName="Projects"
+            items={this.state.projects}
+            removeCard={this.removeCard}
+            markComplete={this.markAsComplete}
+          />
+
           <ItemGroup
             groupName="Goals"
             items={this.state.goals}
@@ -201,7 +193,11 @@ class App extends Component {
           />
         </div>
         <div className="overview-container">
-          <Overview upcoming={[]} completed={[]} />
+          <Overview
+            upcoming={this.makeUpcomingList()}
+            completed={this.makeCompletedList()}
+            today={this.state.today}
+          />
         </div>
       </div>
     );

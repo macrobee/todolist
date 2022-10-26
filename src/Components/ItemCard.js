@@ -12,12 +12,14 @@ class ItemCard extends Component {
     super(props);
     this.state = {
       collapsed: true,
+      isEditing: false,
     };
     this.toggleCollapse = this.toggleCollapse.bind(this);
     this.toggleCollapseIcon = this.toggleCollapseIcon.bind(this);
     this.isItemCollapsed = this.isItemCollapsed.bind(this);
     this.completionCheck = this.completionCheck.bind(this);
     this.translatePriority = this.translatePriority.bind(this);
+    this.toggleEdit = this.toggleEdit.bind(this);
     // this.markAsComplete = this.markAsComplete.bind(this);
   }
   toggleCollapse() {
@@ -58,7 +60,9 @@ class ItemCard extends Component {
     }
     return descriptor;
   }
-
+  toggleEdit(){
+    this.toggleCollapse();
+  }
   render() {
     return (
       <div
@@ -86,7 +90,7 @@ class ItemCard extends Component {
           category={this.props.category}
         >
           <Trash height={20} width={20} onClick={this.props.removeCard} />
-          <Edit height={18} width={18} />
+          <Edit height={18} width={18} onClick={this.toggleEdit}/>
           {this.toggleCollapseIcon()}
         </div>
 

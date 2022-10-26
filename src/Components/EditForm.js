@@ -13,12 +13,13 @@ class EditForm extends Component {
       priority: 1,
       completed: false,
       missingField: null,
+      invalidDate: null,
     };
     // this.collectDataOnSubmit = this.collectDataOnSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.logData = this.logData.bind(this);
     this.sendData = this.sendData.bind(this);
     this.renderErrorMessage = this.renderErrorMessage.bind(this);
+    this.checkIfDateValid = this.checkIfDateValid.bind(this);
   }
   handleChange(e) {
     const target = e.target.id;
@@ -28,7 +29,6 @@ class EditForm extends Component {
   sendData(e) {
     e.preventDefault();
     const { title, type, description, due, priority, completed } = this.state;
-    console.log(title, type, description, due, priority, completed);
     const taskType = type;
     const newData = {
       title,
@@ -41,12 +41,17 @@ class EditForm extends Component {
 
     // handling case if user leaves field blank
     let missingDataField = this.findMissingField(newData);
-    console.log(missingDataField + " is missing");
+    // handling case if date entered is in the past
+    let dateIsValid = this.checkIfDateValid(newData.due);
+
     if (missingDataField) {
       const errorMessage = this.renderErrorMessage(missingDataField);
-      this.setState({ missingField: errorMessage });
-    } else {
-      this.setState({ missingField: null });
+      this.setState({ missingField: errorMessage, invalidDate: null });
+    } else if (!dateIsValid) {
+      const errorMessage = <p>Date must be in the future</p>;
+      this.setState({ missingField: null, invalidDate: errorMessage });
+    } else if (!missingDataField && dateIsValid) {
+      this.setState({ missingField: null, invalidDate: null });
       this.props.addTask(taskType, newData);
       this.props.closeEditor();
     }
@@ -73,12 +78,19 @@ class EditForm extends Component {
     };
     return <p>Please enter a {possibleFields[missingField]}</p>;
   }
-  logData() {
-    //for testing
-    console.log(this.state);
+  checkIfDateValid(date) {
+    const today = this.props.today;
+    const itemDate = new Date(date);
+    if (today - itemDate > 0) {
+      return false;
+    } else {
+      return true;
+    }
   }
+
   render() {
     const renderError = this.state.missingField;
+    const dateIsInvalid = this.state.invalidDate;
     return (
       <div className="edit-form">
         {/* <button onClick={this.logData}>Log current data</button> */}
@@ -143,7 +155,10 @@ class EditForm extends Component {
               onChange={this.handleChange}
             />
           </div>
-          <div className="error">{renderError}</div>
+          <div className="error">
+            {renderError}
+            {dateIsInvalid}
+          </div>
         </form>
       </div>
     );

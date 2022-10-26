@@ -65,6 +65,7 @@ p{
 .card-priority{
     padding-left: 10px;
     grid-area: priority;
+    align-items: start;
     text-align: end;
 }
 .Completed{
