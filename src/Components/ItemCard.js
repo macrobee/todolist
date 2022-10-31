@@ -79,8 +79,10 @@ class ItemCard extends Component {
           description={this.props.description}
           priority={this.props.priority}
           identifier={this.props.identifier}
+          completed={this.props.completed}
           category={this.props.category}
           toggleEdit={this.toggleEdit}
+          editTask={this.props.editTask}
         />
       );
     } else {

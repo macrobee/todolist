@@ -26,6 +26,7 @@ class ItemGroup extends Component {
           identifier={card.identifier}
           completed={card.completed}
           markComplete={this.props.markComplete}
+          editTask={this.props.editTask}
         />
       );
     });

@@ -18,13 +18,13 @@ class EditingItem extends Component {
   }
   sendData(e){
     e.preventDefault();
-    console.log(this.state);
-    console.log('sent data');
+    const {title, description, due, priority, completed, identifier} = this.state;
+    const updatedTaskData = {title, description, due, priority, completed, identifier};
+    this.props.editTask(updatedTaskData, this.props.category)
   }
   handleChange(e) {
     const target = e.target.id;
     const value = e.target.value;
-    console.log(value);
     this.setState({ [target]: value });
   }
   render() {

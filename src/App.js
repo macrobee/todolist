@@ -54,6 +54,7 @@ class App extends Component {
     };
     this.addNewItem = this.addNewItem.bind(this);
     this.addTask = this.addTask.bind(this);
+    this.editTask = this.editTask.bind(this);
 
     this.removeCard = this.removeCard.bind(this);
     this.markAsComplete = this.markAsComplete.bind(this);
@@ -76,10 +77,17 @@ class App extends Component {
       return { [type]: state[type].concat(info) };
     });
   }
-  modifyTask(task){
-    //get current task title, description, due, priority, completion
-    //collect new info
-    //replace task in list
+  editTask(newTaskData, category){
+    
+    let updatedTaskList = this.state[category].map((task)=>{
+      if (task.identifier !== newTaskData.identifier){
+        return task;
+      } else if (task.identifier === newTaskData.identifier){
+        return newTaskData;
+      }
+    });
+    this.setState({[category]: updatedTaskList});
+
   }
   removeCard(e) {
     //done
@@ -94,8 +102,6 @@ class App extends Component {
     });
     this.setState({ [taskCategory]: newTaskList });
   }
-
-  
   markAsComplete(e) {
     //done
     const taskIdentifier =
@@ -177,12 +183,14 @@ class App extends Component {
             items={this.state.todos}
             removeCard={this.removeCard}
             markComplete={this.markAsComplete}
+            editTask={this.editTask}
           />
           <ItemGroup
             groupName="Projects"
             items={this.state.projects}
             removeCard={this.removeCard}
             markComplete={this.markAsComplete}
+            editTask={this.editTask}
           />
 
           <ItemGroup
@@ -190,6 +198,7 @@ class App extends Component {
             items={this.state.goals}
             removeCard={this.removeCard}
             markComplete={this.markAsComplete}
+            editTask={this.editTask}
           />
         </div>
         <div className="overview-container">
