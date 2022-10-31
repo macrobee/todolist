@@ -6,6 +6,7 @@ import { ReactComponent as Circle } from "./circle.svg";
 import { ReactComponent as CheckMark } from "./checkmark.svg";
 import { ReactComponent as Expand } from "./expand.svg";
 import { ReactComponent as Collapse } from "./collapse.svg";
+import EditingItem from "./EditingItem";
 
 class ItemCard extends Component {
   constructor(props) {
@@ -60,49 +61,69 @@ class ItemCard extends Component {
     }
     return descriptor;
   }
-  toggleEdit(){
-    this.toggleCollapse();
+  toggleEdit() {
+    if (this.state.collapsed) {
+      this.toggleCollapse();
+    }
+    this.setState((state) => {
+      return { isEditing: !state.isEditing };
+    });
+    console.log(this.state);
   }
   render() {
-    return (
-      <div
-        className={
-          `item-card ` +
-          ` item-` +
-          this.isItemCollapsed() +
-          ` priority-` +
-          this.props.priority
-        }
-        identifier={this.props.identifier}
-      >
-        <div
-          className="card-heading"
+    if (this.state.isEditing) {
+      return (
+        <EditingItem
+          title={this.props.title}
+          due={this.props.due}
+          description={this.props.description}
+          priority={this.props.priority}
           identifier={this.props.identifier}
           category={this.props.category}
-        >
-          {this.completionCheck()}
-          <h3 className="card-title">{this.props.title}</h3>
-        </div>
-        <p className="card-due">due {this.props.due}</p>
+          toggleEdit={this.toggleEdit}
+        />
+      );
+    } else {
+      return (
         <div
-          className="card-actions"
+          className={
+            `item-card ` +
+            ` item-` +
+            this.isItemCollapsed() +
+            ` priority-` +
+            this.props.priority
+          }
           identifier={this.props.identifier}
-          category={this.props.category}
         >
-          <Trash height={20} width={20} onClick={this.props.removeCard} />
-          <Edit height={18} width={18} onClick={this.toggleEdit}/>
-          {this.toggleCollapseIcon()}
-        </div>
+          <div
+            className="card-heading"
+            identifier={this.props.identifier}
+            category={this.props.category}
+          >
+            {this.completionCheck()}
+            <h3 className="card-title">{this.props.title}</h3>
+          </div>
+          <p className="card-due">due {this.props.due}</p>
+          <div
+            className="card-actions"
+            identifier={this.props.identifier}
+            category={this.props.category}
+          >
+            <Trash height={20} width={20} onClick={this.props.removeCard} />
+            <Edit height={18} width={18} onClick={this.toggleEdit} />
+            {this.toggleCollapseIcon()}
+          </div>
 
-        <div className="card-description">
-          <p className="description-text">{this.props.description}</p>
+          <div className="card-description">
+            <p className="description-text">{this.props.description}</p>
+          </div>
+          <div className="card-priority">
+            <p className="priority-text">{this.translatePriority()} priority</p>
+          </div>
+          {/* <p className="card-completion" >{this.completionCheck()}</p>  */}
         </div>
-        <div className="card-priority">
-          <p className="priority-text">{this.translatePriority()} priority</p>
-        </div>
-        {/* <p className="card-completion" >{this.completionCheck()}</p>  */}
-      </div>
-    );
+      );
+    }
   }
   //   componentDidUpdate(){
   //     this.completionCheck();
