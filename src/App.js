@@ -12,50 +12,49 @@ class App extends Component {
     super();
     this.state = {
       projects: [
-        {
-          title: "Todo List",
-          description: "Complete features of todo list project",
-          due: "2022-11-29",
-          priority: 2,
-          completed: false,
-          identifier: uniqid(),
-        },
-        {
-          title: "Weather app",
-          description: "learn APIs and async data handling",
-          due: "2022-12-29",
-          priority: 1,
-          completed: false,
-          identifier: uniqid(),
-        },
+        // {
+        //   title: "Todo List",
+        //   description: "Complete features of todo list project",
+        //   due: "2022-11-29",
+        //   priority: 2,
+        //   completed: false,
+        //   identifier: "asdfadsf1",
+        // },
+        // {
+        //   title: "Weather app",
+        //   description: "learn APIs and async data handling",
+        //   due: "2022-12-29",
+        //   priority: 1,
+        //   completed: false,
+        //   identifier: "asdfadsf2",
+        // },
       ],
       todos: [
-        {
-          title: "Run 5k",
-          description: "run around neighborhood 3 times",
-          due: "2023-10-26",
-          priority: 1,
-          completed: false,
-          identifier: uniqid(),
-        },
+        // {
+        //   title: "Run 5k",
+        //   description: "run around neighborhood 3 times",
+        //   due: "2023-10-26",
+        //   priority: 1,
+        //   completed: false,
+        //   identifier: "asdfadsf3",
+        // },
       ],
       goals: [
-        {
-          title: "Run a marathon",
-          description: "digest food",
-          due: "2023-10-27",
-          priority: 0,
-          completed: false,
-          identifier: uniqid(),
-        },
+        // {
+        //   title: "Run a marathon",
+        //   description: "digest food",
+        //   due: "2023-10-27",
+        //   priority: 0,
+        //   completed: false,
+        //   identifier: "asdfadsf4",
+        // },
       ],
       isEditing: false,
       today: null,
     };
-    this.addNewItem = this.addNewItem.bind(this);
     this.addTask = this.addTask.bind(this);
     this.editTask = this.editTask.bind(this);
-
+    this.saveToLocalStorage = this.saveToLocalStorage.bind(this);
     this.removeCard = this.removeCard.bind(this);
     this.markAsComplete = this.markAsComplete.bind(this);
     this.toggleEditor = this.toggleEditor.bind(this);
@@ -66,27 +65,46 @@ class App extends Component {
   componentDidMount() {
     const today = new Date(new Date().toISOString().slice(0, 10));
     this.setState({ today });
+    const savedProjects = JSON.parse(localStorage.getItem("projects"));
+    const savedTodos = JSON.parse(localStorage.getItem("todos"));
+    const savedGoals = JSON.parse(localStorage.getItem("goals"));
+    this.setState({
+      projects: savedProjects,
+      todos: savedTodos,
+      goals: savedGoals,
+    });
+
+    console.log(this.state);
+    console.log(window.localStorage);
     //get state data from local storage
   }
-  addNewItem() {
-    this.addTask("goals", newItem);
-  }
 
-  addTask(type, info) {
-    this.setState((state) => {
+  async addTask(type, info) {
+    await this.setState((state) => {
       return { [type]: state[type].concat(info) };
     });
+
+    this.saveToLocalStorage();
+    console.log("add task was called");
   }
-  editTask(newTaskData, category){
-    
-    let updatedTaskList = this.state[category].map((task)=>{
-      if (task.identifier !== newTaskData.identifier){
+  editTask(newTaskData, category) {
+    let updatedTaskList = this.state[category].map((task) => {
+      if (task.identifier !== newTaskData.identifier) {
         return task;
-      } else if (task.identifier === newTaskData.identifier){
+      } else {
         return newTaskData;
       }
     });
-    this.setState({[category]: updatedTaskList});
+    this.setState({ [category]: updatedTaskList });
+  }
+  saveToLocalStorage() {
+    localStorage.clear();
+    window.localStorage.setItem(
+      "projects",
+      JSON.stringify(this.state.projects)
+    );
+    window.localStorage.setItem("todos", JSON.stringify(this.state.todos));
+    window.localStorage.setItem("goals", JSON.stringify(this.state.goals));
 
   }
   removeCard(e) {
@@ -98,7 +116,7 @@ class App extends Component {
       .getAttribute("category")
       .toLowerCase();
     let newTaskList = this.state[taskCategory].filter((task) => {
-      return task.identifier != taskIdentifier;
+      return task.identifier !== taskIdentifier;
     });
     this.setState({ [taskCategory]: newTaskList });
   }
@@ -132,7 +150,11 @@ class App extends Component {
   showEditor() {
     if (this.state.isEditing) {
       return (
-        <EditForm addTask={this.addTask} closeEditor={this.toggleEditor} today={this.state.today}/>
+        <EditForm
+          addTask={this.addTask}
+          closeEditor={this.toggleEditor}
+          today={this.state.today}
+        />
       );
     } else {
       return null;
@@ -176,7 +198,6 @@ class App extends Component {
         </div>
 
         {this.showEditor()}
-        {/* <button onClick={this.addNewItem}>Log new</button>  */}
         <div className="taskgroup-container">
           <ItemGroup
             groupName="Todos"
@@ -212,7 +233,7 @@ class App extends Component {
     );
   }
   componentDidUpdate() {
-    // console.log(this.state);
+    this.saveToLocalStorage();
   }
 }
 

@@ -53,11 +53,11 @@ class ItemCard extends Component {
   translatePriority() {
     let descriptor;
     if (this.props.priority === 0) {
-      descriptor = "low";
+      descriptor = "Low";
     } else if (this.props.priority === 1) {
-      descriptor = "medium";
+      descriptor = "Medium";
     } else {
-      descriptor = "high";
+      descriptor = "High";
     }
     return descriptor;
   }

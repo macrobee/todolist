@@ -16,6 +16,7 @@
     row-gap: 12px;
     /* column-gap: 10px; */
     box-shadow: 3px 3px 0 2px var(--medium);
+    overflow: hidden;
 }
 .item-expanded{
     height: 95px;
@@ -88,3 +89,24 @@ border-right: 10px solid rgb(117, 231, 117);
 .card-actions svg:hover{
 transform: scale(1.1);
 }
+
+@media screen and (max-width: 475px){
+    .item-card{
+      grid-template-areas: "title actions"
+      "due due"
+      "description description"
+      "priority priority";
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: repeat(4, 1fr);
+      row-gap: 5px;
+    }
+    .card-due{
+        margin-left: 35px;
+    }
+    .item-collapsed{
+        height: 43px;
+    }
+    .item-expanded{
+        height: 150px;
+    }
+  }

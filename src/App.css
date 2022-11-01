@@ -52,7 +52,7 @@ h1 {
   text-align: left;
   color: var(--highlight);
 }
-h2{
+h2 {
   margin: 0;
 }
 .overview-container {
@@ -80,9 +80,9 @@ h2{
   display: flex;
   gap: 14px;
   justify-content: center;
-  align-items:center;
+  align-items: center;
 }
-#add-task:hover{
+#add-task:hover {
   transform: scale(1.06);
   background-color: var(--darker);
 }
@@ -91,4 +91,28 @@ h2{
   justify-content: center;
   align-items: center;
   padding-right: 50px;
+}
+
+@media screen and (max-width: 800px) {
+  .App {
+    grid-template-areas:
+      "header"
+      "tasks"
+      "overview";
+      grid-template-columns: 1fr;
+  }
+}
+@media screen and (max-width: 550px){
+  .App{
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+  }
+  .item-group{
+    width: 100%;
+  }
+  .edit-form{
+    width: 100vw;
+  }
 }

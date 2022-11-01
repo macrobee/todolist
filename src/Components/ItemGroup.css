@@ -2,7 +2,7 @@
     /* background-color: var(--highlight); */
     border-radius: 10px;
     /* border: 5px solid black; */
-    width: max(500px, 90%);
+    width: clamp(500px, 90%);
     /* display: flex; */
     padding: 10px;
     display: flex;
