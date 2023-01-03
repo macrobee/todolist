@@ -65,18 +65,19 @@ class App extends Component {
   componentDidMount() {
     const today = new Date(new Date().toISOString().slice(0, 10));
     this.setState({ today });
-    const savedProjects = JSON.parse(localStorage.getItem("projects"));
-    const savedTodos = JSON.parse(localStorage.getItem("todos"));
-    const savedGoals = JSON.parse(localStorage.getItem("goals"));
-    this.setState({
-      projects: savedProjects,
-      todos: savedTodos,
-      goals: savedGoals,
-    });
-
-    console.log(this.state);
-    console.log(window.localStorage);
-    //get state data from local storage
+    if (localStorage.length) {
+      const savedProjects = JSON.parse(localStorage.getItem("projects"));
+      const savedTodos = JSON.parse(localStorage.getItem("todos"));
+      const savedGoals = JSON.parse(localStorage.getItem("goals"));
+     
+      this.setState({
+        projects: savedProjects ? savedProjects : [],
+        todos: savedTodos ? savedProjects: [],
+        goals: savedGoals ? savedGoals: [],
+      });
+    } else {
+      this.setState({ projects: [], todos: [], goals: [] });
+    }
   }
 
   async addTask(type, info) {
@@ -85,7 +86,6 @@ class App extends Component {
     });
 
     this.saveToLocalStorage();
-    console.log("add task was called");
   }
   editTask(newTaskData, category) {
     let updatedTaskList = this.state[category].map((task) => {
@@ -105,7 +105,6 @@ class App extends Component {
     );
     window.localStorage.setItem("todos", JSON.stringify(this.state.todos));
     window.localStorage.setItem("goals", JSON.stringify(this.state.goals));
-
   }
   removeCard(e) {
     //done
@@ -162,7 +161,12 @@ class App extends Component {
   }
   makeUpcomingList() {
     const { projects, todos, goals } = this.state;
-    const allTasks = [...projects, ...todos, ...goals];
+    let allTasks;
+    if (projects.length >0 || todos.length >0 || goals.length>0) {
+      allTasks = [...projects, ...todos, ...goals];
+    } else {
+      allTasks = [];
+    }
     let incompleteTasks = allTasks.filter((task) => {
       return task.completed === false;
     });
